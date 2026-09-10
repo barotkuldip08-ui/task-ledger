@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Ledger</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="app-container">
+        <header>
+            <div class="title-group">
+                <h1>Task Ledger</h1>
+                <p class="tagline">Master your daily flow</p>
+            </div>
+            <span id="taskCount">0 of 0 done</span>
+        </header>
+
+        <form id="taskForm">
+            <div class="form-row">
+                <input 
+                    type="text" 
+                    id="taskInput" 
+                    placeholder="What needs to be done?" 
+                    required 
+                    autocomplete="off"
+                >
+                <select id="taskPriority" title="Select priority">
+                    <option value="high">High</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="low">Low</option>
+                </select>
+                <button type="submit" id="addBtn">Add Task</button>
+            </div>
+        </form>
+
+        <div class="control-panel">
+            <div class="filter-tabs">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="active">Active</button>
+                <button class="filter-btn" data-filter="completed">Done</button>
+            </div>
+            <button id="clearBtn" class="clear-action">Clear Completed</button>
+        </div>
+
+        <section class="task-list-section">
+            <p id="emptyState">No tasks to display.</p>
+            <ul id="taskList"></ul>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
