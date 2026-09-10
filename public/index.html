@@ -3,48 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Ledger</title>
+    <title>TASK LEDGER // HUD OS</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 </head>
 <body>
-    <main class="app-container">
-        <header>
-            <div class="title-group">
-                <h1>Task Ledger</h1>
-                <p class="tagline">Master your daily flow</p>
+    <!-- Background Grid & Dynamic Cursor Spotlight -->
+    <div class="spotlight-layer" id="spotlight"></div>
+    <div class="cyber-grid"></div>
+
+    <main class="hud-container">
+        <!-- HUD Header -->
+        <header class="hud-header">
+            <div class="brand-meta">
+                <div class="sys-status">
+                    <span class="pulse-beacon"></span>
+                    <span class="sys-text">TASK LEDGER // PRO OS</span>
+                </div>
+                <h1 class="main-title">COMMAND CENTER</h1>
             </div>
-            <span id="taskCount">0 of 0 done</span>
+
+            <!-- Pomodoro Live Widget -->
+            <div class="pomo-widget">
+                <div class="pomo-display" id="pomoDisplay">25:00</div>
+                <div class="pomo-actions">
+                    <button id="pomoToggle" class="pomo-btn" title="Start/Pause Focus Timer">▶</button>
+                    <button id="pomoReset" class="pomo-btn reset" title="Reset Timer">↺</button>
+                </div>
+            </div>
         </header>
 
-        <form id="taskForm">
-            <div class="form-row">
+        <!-- Gamification XP Deck -->
+        <section class="xp-deck">
+            <div class="xp-header">
+                <div class="rank-badge" id="rankBadge">LVL 1 // ROOKIE</div>
+                <div class="xp-count"><span id="currentXp">0</span> XP</div>
+            </div>
+            <div class="xp-track">
+                <div class="xp-bar" id="xpBar"></div>
+            </div>
+            <div class="xp-footer">
+                <span id="streakCount">🔥 0 Day Streak</span>
+                <span id="taskStats">0 of 0 Completed</span>
+            </div>
+        </section>
+
+        <!-- Task Creation Engine -->
+        <form id="taskForm" class="hud-form">
+            <div class="input-glow-group">
+                <span class="prompt-arrow">❯</span>
                 <input 
                     type="text" 
                     id="taskInput" 
-                    placeholder="What needs to be done?" 
+                    placeholder="Initialize mission objective... (Double click task to edit)" 
                     required 
                     autocomplete="off"
                 >
-                <select id="taskPriority" title="Select priority">
-                    <option value="high">High</option>
-                    <option value="medium" selected>Medium</option>
-                    <option value="low">Low</option>
-                </select>
-                <button type="submit" id="addBtn">Add Task</button>
+            </div>
+            <div class="form-controls">
+                <div class="meta-inputs">
+                    <select id="taskPriority">
+                        <option value="high">🔴 High Priority (+100 XP)</option>
+                        <option value="medium" selected>🟡 Medium Priority (+50 XP)</option>
+                        <option value="low">🔵 Low Priority (+25 XP)</option>
+                    </select>
+                    <input type="date" id="taskDueDate" title="Set mission deadline">
+                </div>
+                <button type="submit" id="addBtn">
+                    <span>EXECUTE</span>
+                    <kbd>↵</kbd>
+                </button>
             </div>
         </form>
 
-        <div class="control-panel">
-            <div class="filter-tabs">
-                <button class="filter-btn active" data-filter="all">All</button>
-                <button class="filter-btn" data-filter="active">Active</button>
-                <button class="filter-btn" data-filter="completed">Done</button>
+        <!-- Search & Control Bar -->
+        <div class="filter-strip">
+            <div class="cyber-search">
+                <span class="search-ico">⚡</span>
+                <input type="text" id="searchInput" placeholder="Filter radar...">
+                <kbd class="kbd-shortcut">Ctrl K</kbd>
             </div>
-            <button id="clearBtn" class="clear-action">Clear Completed</button>
+            <div class="filter-actions">
+                <div class="tabs">
+                    <button class="tab-btn active" data-filter="all">All</button>
+                    <button class="tab-btn" data-filter="active">Active</button>
+                    <button class="tab-btn" data-filter="completed">Done</button>
+                </div>
+                <button id="clearBtn" class="purge-btn">Purge Done</button>
+            </div>
         </div>
 
-        <section class="task-list-section">
-            <p id="emptyState">No tasks to display.</p>
+        <!-- Task Stream -->
+        <section class="task-vault">
+            <p id="emptyState" class="empty-state">Radar silent. All systems nominal.</p>
             <ul id="taskList"></ul>
         </section>
     </main>
