@@ -503,13 +503,16 @@ telemetryModal.addEventListener('click', (e) => {
     if (e.target === telemetryModal) closeModal();
 });
 
-// CSV Export Generator
+// CSV Export Generator with Fallbacks
 exportCsvBtn.addEventListener('click', () => {
     if (allTasks.length === 0) return alert('No tasks to export!');
 
     let csv = 'ID,Title,Priority,Completed,DueDate,CreatedAt\n';
     allTasks.forEach(t => {
-        csv += `"${t.id}","${t.title.replace(/"/g, '""')}","${t.priority}","${t.completed}","${t.dueDate || ''}","${t.createdAt}"\n`;
+        const priority = t.priority || 'medium';
+        const dueDate = t.dueDate || 'No Deadline';
+        const createdAt = t.createdAt ? new Date(t.createdAt).toLocaleString() : 'Legacy Task';
+        csv += `"'${t.id}'","${t.title.replace(/"/g, '""')}","${priority}","${t.completed}","${dueDate}","${createdAt}"\n`;
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -520,6 +523,3 @@ exportCsvBtn.addEventListener('click', () => {
     a.click();
     URL.revokeObjectURL(url);
 });
-
-renderPomo();
-loadTasks();
