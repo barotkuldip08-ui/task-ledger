@@ -35,7 +35,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Cyber Matrix Background */
 .cyber-grid {
     position: fixed;
     inset: 0;
@@ -48,7 +47,6 @@ body {
     z-index: 0;
 }
 
-/* Mouse Follow Ambient Spotlight */
 .spotlight-layer {
     position: fixed;
     inset: 0;
@@ -57,13 +55,12 @@ body {
     z-index: 1;
 }
 
-/* HUD Master Container */
 .hud-container {
     background: var(--card-surface);
     backdrop-filter: blur(28px);
     -webkit-backdrop-filter: blur(28px);
     width: 100%;
-    max-width: 640px;
+    max-width: 650px;
     border-radius: 26px;
     border: 1px solid var(--card-border);
     box-shadow: 
@@ -124,7 +121,34 @@ body {
     -webkit-text-fill-color: transparent;
 }
 
-/* Pomodoro Widget */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hud-action-btn {
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: var(--neon-blue);
+    padding: 7px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.76rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.hud-action-btn:hover {
+    background: rgba(56, 189, 248, 0.2);
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+    transform: translateY(-1px);
+}
+
+/* Pomodoro */
 .pomo-widget {
     background: rgba(0, 0, 0, 0.45);
     border: 1px solid var(--card-border);
@@ -137,7 +161,7 @@ body {
 
 .pomo-display {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 700;
     color: var(--neon-rose);
     letter-spacing: 1px;
@@ -228,7 +252,7 @@ body {
     font-weight: 600;
 }
 
-/* Task Form */
+/* Form */
 .hud-form {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--card-border);
@@ -408,7 +432,7 @@ body {
     color: var(--neon-rose);
 }
 
-/* Task Vault Stream */
+/* Tasks */
 .empty-state {
     text-align: center;
     color: var(--text-dark);
@@ -453,7 +477,6 @@ body {
     background: rgba(245, 158, 11, 0.04);
 }
 
-/* Bullet Switch */
 .bullet {
     width: 20px;
     height: 20px;
@@ -472,7 +495,6 @@ body {
     box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
 }
 
-/* Task Body */
 .task-content {
     flex: 1;
     display: flex;
@@ -505,7 +527,6 @@ body {
     font-weight: 700;
 }
 
-/* Priority Badges */
 .badge {
     font-size: 0.65rem;
     font-weight: 700;
@@ -564,7 +585,6 @@ body {
     color: var(--neon-rose);
 }
 
-/* Completed Status */
 li.completed {
     opacity: 0.42;
 }
@@ -588,4 +608,162 @@ li.completed .bullet::after {
 li.completed .title {
     text-decoration: line-through;
     color: var(--text-dim);
+}
+
+/* MODAL & TELEMETRY */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(14px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 100;
+    transition: opacity 0.25s ease;
+}
+
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-card {
+    background: rgba(14, 18, 28, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.9), 0 0 30px rgba(56, 189, 248, 0.15);
+    border-radius: 22px;
+    width: 100%;
+    max-width: 580px;
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transform: scale(1);
+    transition: transform 0.25s ease;
+}
+
+.modal-overlay.hidden .modal-card {
+    transform: scale(0.95);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.sub-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--neon-cyan);
+    letter-spacing: 1px;
+}
+
+.modal-header h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+.modal-close-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--card-border);
+    color: var(--text-dim);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+    background: rgba(244, 63, 94, 0.2);
+    color: var(--neon-rose);
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.metric-box {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--card-border);
+    padding: 12px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.metric-title {
+    font-size: 0.64rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+}
+
+.metric-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--neon-emerald);
+}
+
+.metric-value.text-cyan { color: var(--neon-cyan); }
+.metric-value.text-rose { color: var(--neon-rose); }
+
+.charts-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.chart-wrapper {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--card-border);
+    padding: 14px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.chart-wrapper h4 {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-weight: 600;
+}
+
+.canvas-holder {
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.export-btn {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--neon-cyan);
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.export-btn:hover {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
 }

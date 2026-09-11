@@ -18,9 +18,20 @@ const pomoDisplay = document.getElementById('pomoDisplay');
 const pomoToggle = document.getElementById('pomoToggle');
 const pomoReset = document.getElementById('pomoReset');
 
+// Telemetry & Modal Elements
+const analyticsBtn = document.getElementById('analyticsBtn');
+const telemetryModal = document.getElementById('telemetryModal');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const kpiRate = document.getElementById('kpiRate');
+const kpiXp = document.getElementById('kpiXp');
+const kpiPending = document.getElementById('kpiPending');
+const exportCsvBtn = document.getElementById('exportCsvBtn');
+
 let allTasks = [];
 let activeFilter = 'all';
 let searchQuery = '';
+let priorityChartInstance = null;
+let statusChartInstance = null;
 
 // XP & Gamification Engine
 let userXp = parseInt(localStorage.getItem('ledger_xp') || '0', 10);
@@ -88,7 +99,7 @@ function playSound(type) {
     } catch (e) {}
 }
 
-// Interactive Mouse Spotlight
+// Interactive Spotlight
 window.addEventListener('mousemove', (e) => {
     document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
     document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
@@ -164,7 +175,7 @@ function getDueDateStatus(dueDateStr) {
     return { text: `In ${days}d`, isOverdue: false };
 }
 
-// Render Core
+// Render Tasks
 function render() {
     taskList.innerHTML = '';
 
@@ -189,12 +200,10 @@ function render() {
         if (task.completed) li.classList.add('completed');
         if (task.pinned) li.classList.add('pinned');
 
-        // Checkbox bullet
         const bullet = document.createElement('span');
         bullet.className = 'bullet';
         bullet.onclick = () => toggleTask(task.id);
 
-        // Content
         const content = document.createElement('div');
         content.className = 'task-content';
 
@@ -203,7 +212,6 @@ function render() {
         title.textContent = task.title;
         title.title = 'Double click to edit';
 
-        // Double click inline edit
         title.addEventListener('dblclick', () => {
             title.contentEditable = 'true';
             title.focus();
@@ -236,12 +244,10 @@ function render() {
             }
         }
 
-        // Priority Badge
         const badge = document.createElement('span');
         badge.className = `badge ${task.priority || 'medium'}`;
         badge.textContent = task.priority || 'medium';
 
-        // Star Pin
         const star = document.createElement('button');
         star.className = `star-btn ${task.pinned ? 'active' : ''}`;
         star.innerHTML = task.pinned ? '★' : '☆';
@@ -250,7 +256,6 @@ function render() {
             togglePin(task.id);
         };
 
-        // Remove
         const remove = document.createElement('button');
         remove.className = 'remove-btn';
         remove.innerHTML = '✕';
@@ -261,7 +266,6 @@ function render() {
 
         li.append(bullet, content, badge, star, remove);
 
-        // Drag & Drop Listeners
         li.addEventListener('dragstart', () => li.classList.add('dragging'));
         li.addEventListener('dragend', () => {
             li.classList.remove('dragging');
@@ -271,7 +275,6 @@ function render() {
         taskList.appendChild(li);
     });
 
-    // Native Drag and Drop Sorting Over
     taskList.addEventListener('dragover', (e) => {
         e.preventDefault();
         const draggingItem = document.querySelector('.dragging');
@@ -281,12 +284,11 @@ function render() {
         taskList.insertBefore(draggingItem, nextSibling);
     });
 
-    // Stats
     const completedCount = allTasks.filter(t => t.completed).length;
     taskStats.textContent = `${completedCount} of ${allTasks.length} Completed`;
 }
 
-// Drag Reorder Persistence
+// Reorder Sync
 async function persistReorder() {
     const currentDomIds = [...taskList.querySelectorAll('li')].map(li => li.dataset.id);
     allTasks.sort((a, b) => currentDomIds.indexOf(a.id) - currentDomIds.indexOf(b.id));
@@ -341,7 +343,7 @@ taskForm.addEventListener('submit', async (e) => {
     }
 });
 
-// Toggle Task & XP Awards
+// Toggle Task
 async function toggleTask(id) {
     try {
         const res = await fetch(`/api/tasks/${id}`, {
@@ -407,21 +409,24 @@ clearBtn.addEventListener('click', async () => {
     }
 });
 
-// Search
+// Search Filter
 searchInput.addEventListener('input', (e) => {
     searchQuery = e.target.value;
     render();
 });
 
-// Shortcut Ctrl+K
+// Shortcuts
 window.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         searchInput.focus();
     }
+    if (e.key === 'Escape' && !telemetryModal.classList.contains('hidden')) {
+        closeModal();
+    }
 });
 
-// Tabs
+// Tab Filters
 filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         filterBtns.forEach(b => b.classList.remove('active'));
@@ -429,6 +434,91 @@ filterBtns.forEach(btn => {
         activeFilter = btn.dataset.filter;
         render();
     });
+});
+
+// =======================================
+// TELEMETRY & CHART.JS ENGINE
+// =======================================
+function openTelemetry() {
+    telemetryModal.classList.remove('hidden');
+
+    const total = allTasks.length;
+    const completed = allTasks.filter(t => t.completed).length;
+    const pending = total - completed;
+    const rate = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+    kpiRate.textContent = `${rate}%`;
+    kpiXp.textContent = `${userXp} XP`;
+    kpiPending.textContent = pending;
+
+    const highCount = allTasks.filter(t => t.priority === 'high').length;
+    const medCount = allTasks.filter(t => t.priority === 'medium').length;
+    const lowCount = allTasks.filter(t => t.priority === 'low').length;
+
+    if (priorityChartInstance) priorityChartInstance.destroy();
+    if (statusChartInstance) statusChartInstance.destroy();
+
+    const pCtx = document.getElementById('priorityChart').getContext('2d');
+    priorityChartInstance = new Chart(pCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['High', 'Med', 'Low'],
+            datasets: [{
+                data: [highCount, medCount, lowCount],
+                backgroundColor: ['#f43f5e', '#f59e0b', '#06b6d4'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            cutout: '72%'
+        }
+    });
+
+    const sCtx = document.getElementById('statusChart').getContext('2d');
+    statusChartInstance = new Chart(sCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Done', 'Active'],
+            datasets: [{
+                data: [completed, pending],
+                backgroundColor: ['#10b981', '#334155'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            cutout: '72%'
+        }
+    });
+}
+
+function closeModal() {
+    telemetryModal.classList.add('hidden');
+}
+
+analyticsBtn.addEventListener('click', openTelemetry);
+closeModalBtn.addEventListener('click', closeModal);
+telemetryModal.addEventListener('click', (e) => {
+    if (e.target === telemetryModal) closeModal();
+});
+
+// CSV Export Generator
+exportCsvBtn.addEventListener('click', () => {
+    if (allTasks.length === 0) return alert('No tasks to export!');
+
+    let csv = 'ID,Title,Priority,Completed,DueDate,CreatedAt\n';
+    allTasks.forEach(t => {
+        csv += `"${t.id}","${t.title.replace(/"/g, '""')}","${t.priority}","${t.completed}","${t.dueDate || ''}","${t.createdAt}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Task_Ledger_Telemetry_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
 });
 
 renderPomo();

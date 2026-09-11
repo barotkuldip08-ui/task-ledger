@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TASK LEDGER // HUD OS</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Confetti & Chart.js CDNs -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- Background Grid & Dynamic Cursor Spotlight -->
     <div class="spotlight-layer" id="spotlight"></div>
     <div class="cyber-grid"></div>
 
@@ -23,12 +24,18 @@
                 <h1 class="main-title">COMMAND CENTER</h1>
             </div>
 
-            <!-- Pomodoro Live Widget -->
-            <div class="pomo-widget">
-                <div class="pomo-display" id="pomoDisplay">25:00</div>
-                <div class="pomo-actions">
-                    <button id="pomoToggle" class="pomo-btn" title="Start/Pause Focus Timer">▶</button>
-                    <button id="pomoReset" class="pomo-btn reset" title="Reset Timer">↺</button>
+            <!-- Action Deck: Pomodoro + Telemetry Trigger -->
+            <div class="header-actions">
+                <button id="analyticsBtn" class="hud-action-btn" title="Open Productivity Telemetry">
+                    <span>📊</span>
+                    <span class="btn-text">Telemetry</span>
+                </button>
+                <div class="pomo-widget">
+                    <div class="pomo-display" id="pomoDisplay">25:00</div>
+                    <div class="pomo-actions">
+                        <button id="pomoToggle" class="pomo-btn" title="Start/Pause">▶</button>
+                        <button id="pomoReset" class="pomo-btn reset" title="Reset">↺</button>
+                    </div>
                 </div>
             </div>
         </header>
@@ -43,7 +50,7 @@
                 <div class="xp-bar" id="xpBar"></div>
             </div>
             <div class="xp-footer">
-                <span id="streakCount">🔥 0 Day Streak</span>
+                <span id="streakCount">🔥 1 Day Streak</span>
                 <span id="taskStats">0 of 0 Completed</span>
             </div>
         </section>
@@ -76,7 +83,7 @@
             </div>
         </form>
 
-        <!-- Search & Control Bar -->
+        <!-- Search & Filter Bar -->
         <div class="filter-strip">
             <div class="cyber-search">
                 <span class="search-ico">⚡</span>
@@ -100,6 +107,56 @@
         </section>
     </main>
 
+    <!-- Telemetry & Analytics Modal -->
+    <div id="telemetryModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <span class="sub-label">// MISSION TELEMETRY</span>
+                    <h2>Productivity Analytics</h2>
+                </div>
+                <button id="closeModalBtn" class="modal-close-btn">✕</button>
+            </div>
+
+            <!-- Live KPI Metric Cards -->
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <span class="metric-title">COMPLETION RATE</span>
+                    <span class="metric-value" id="kpiRate">0%</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-title">TOTAL HARVESTED</span>
+                    <span class="metric-value text-cyan" id="kpiXp">0 XP</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-title">ACTIVE OBJECTIVES</span>
+                    <span class="metric-value text-rose" id="kpiPending">0</span>
+                </div>
+            </div>
+
+            <!-- Visual Charts Container -->
+            <div class="charts-container">
+                <div class="chart-wrapper">
+                    <h4>Priority Allocation</h4>
+                    <div class="canvas-holder">
+                        <canvas id="priorityChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <h4>Mission Status Ratio</h4>
+                    <div class="canvas-holder">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Action Footer -->
+            <div class="modal-footer">
+                <button id="exportCsvBtn" class="export-btn">⬇ Export Mission Ledger (.CSV)</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
-</html>
+</html> 
